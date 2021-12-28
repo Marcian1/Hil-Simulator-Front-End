@@ -2,27 +2,17 @@
   <div id="signin">
     <div class="signin-form">
       <form @submit.prevent="onSubmit">
-        <div class="input">
-          <label for="email">Mail</label>
+
+        <div class="input" required>
+          <label for="labcarname">Labcarname </label>
           <input
-                  type="email"
-                  id="email"
-                  v-model="email">
+                  type="labcarname"
+                  id="labcarname"
+                  v-model="labcarname"
+                  required>
+                  
         </div>
-        <div class="input">
-          <label for="username">Username</label>
-          <input
-                  type="username"
-                  id="username"
-                  v-model="username">
-        </div>
-        <div class="input">
-          <label for="password">Password</label>
-          <input
-                  type="password"
-                  id="password"
-                  v-model="password">
-        </div>
+
         <div class="submit">
           <button type="submit">Submit</button>
         </div>
@@ -35,20 +25,16 @@
   export default {
     data () {
       return {
-        email: '',
-        password: '',
-        username: ''
+        labcarname: ''
       }
     },
     methods: {
       onSubmit () {
         const formData = {
-          email: this.email,
-          password: this.password,
-          username: this.username,
+          labcarname: this.labcarname,
         }
         console.log(formData)
-        this.$store.dispatch('login', {email: formData.email, password: formData.password})
+        this.$store.dispatch('createHil', {labcarname: formData.labcarname})
       }
     }
   }
