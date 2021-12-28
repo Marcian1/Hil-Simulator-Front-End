@@ -5,9 +5,9 @@ import axios from 'axios'
 import router from './router'
 import store from './store'
 
-axios.defaults.baseURL = 'https://vue-update.firebaseio.com'
-// axios.defaults.headers.common['Authorization'] = 'fasfdsa'
-axios.defaults.headers.get['Accepts'] = 'application/json'
+axios.defaults.baseURL = 'http://homestead.test/api'
+axios.defaults.headers.common['Authorization'] = 'Bearer '+ localStorage.getItem('token');
+axios.defaults.headers.get['Accept'] = 'application/json'
 
 const reqInterceptor = axios.interceptors.request.use(config => {
   console.log('Request Interceptor', config)

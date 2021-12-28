@@ -5,20 +5,21 @@ import store from './store'
 
 import WelcomePage from './components/welcome/welcome.vue'
 import DashboardPage from './components/dashboard/dashboard.vue'
-import SignupPage from './components/auth/signup.vue'
 import SigninPage from './components/auth/signin.vue'
-
+import createHil from './components/auth/createHil.vue'
+import createHilEntry from './components/auth/createHilEntry.vue'
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', component: WelcomePage },
-  { path: '/signup', component: SignupPage },
+  { path: '/createHilEntry', component: createHilEntry },
+  { path: '/createHil', component: createHil },
   { path: '/signin', component: SigninPage },
+  { path: '/labcarname', component: SigninPage },
   {
     path: '/dashboard',
     component: DashboardPage,
     beforeEnter (to, from, next) {
-      if (store.state.idToken) {
+      if (store.state.token) {
         next()
       } else {
         next('/signin')

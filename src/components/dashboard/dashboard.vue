@@ -7,7 +7,6 @@
 </template>
 
 <script>
-  import axios from 'axios';
 
   export default {
     computed: {
@@ -15,9 +14,7 @@
         return !this.$store.getters.user ? false : this.$store.getters.user.email
       }
     },
-    created () {
-      this.$store.dispatch('fetchUser')
-    }
+
   }
 </script>
 

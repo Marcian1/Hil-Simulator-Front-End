@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from './axios-auth'
-import globalAxios from 'axios'
+
 
 import router from './router'
 
@@ -9,69 +9,64 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    idToken: null,
+    token: null,
     userId: null,
-    user: null
+    user: null,
+
   },
   mutations: {
+
     authUser (state, userData) {
-      state.idToken = userData.token
-      state.userId = userData.userId
-    },
-    storeUser (state, user) {
-      state.user = user
+      state.token = userData.token
     },
     clearAuthData (state) {
       state.idToken = null
-      state.userId = null
     }
   },
   actions: {
-    setLogoutTimer ({commit}, expirationTime) {
-      setTimeout(() => {
-        commit('clearAuthData')
-      }, expirationTime * 1000)
-    },
-    signup ({commit, dispatch}, authData) {
-      axios.post('/signupNewUser?key=AIzaSyCXlVPPWknVGhfc60mt7Jkv0Xzrho7_mwc', {
-        email: authData.email,
-        password: authData.password,
-        returnSecureToken: true
+    createHil({},formData) {
+      console.log(formData);
+      axios.post('/hils', {
+        labcarname: formData.labcarname,
       })
         .then(res => {
-          console.log(res)
-          commit('authUser', {
-            token: res.data.idToken,
-            userId: res.data.localId
-          })
-          const now = new Date()
-          const expirationDate = new Date(now.getTime() + res.data.expiresIn * 1000)
-          localStorage.setItem('token', res.data.idToken)
-          localStorage.setItem('userId', res.data.localId)
-          localStorage.setItem('expirationDate', expirationDate)
-          dispatch('storeUser', authData)
-          dispatch('setLogoutTimer', res.data.expiresIn)
+          router.replace('/dashboard')
+          console.log('Added new hil!');
         })
         .catch(error => console.log(error))
     },
-    login ({commit, dispatch}, authData) {
-      axios.post('/verifyPassword?key=AIzaSyCXlVPPWknVGhfc60mt7Jkv0Xzrho7_mwc', {
+    createHilEntry({},formData) {
+      console.log(formData);
+      axios.post('/hils/' + formData.hilNumber + '/hilentries', {
+        machinename: formData.machinename,
+        osversion: formData.osversion,
+        projectname: formData.projectname,
+        selectedServers: formData.selectedServers,
+        labcarType: formData.labcarType,
+        autorun: formData.autorun,
+      })
+        .then(res => {
+          router.replace('/dashboard')
+          console.log('Added new hilEntry!');
+          
+        })
+        .catch(error => console.log(error))
+    },
+    login ({commit}, authData) {
+
+      axios.post('/login', {
+        username: authData.username,
         email: authData.email,
         password: authData.password,
         returnSecureToken: true
       })
         .then(res => {
           console.log(res)
-          const now = new Date()
-          const expirationDate = new Date(now.getTime() + res.data.expiresIn * 1000)
-          localStorage.setItem('token', res.data.idToken)
-          localStorage.setItem('userId', res.data.localId)
-          localStorage.setItem('expirationDate', expirationDate)
+          localStorage.setItem('token', res.data.token)
           commit('authUser', {
-            token: res.data.idToken,
-            userId: res.data.localId
+            token: res.data.token,
           })
-          dispatch('setLogoutTimer', res.data.expiresIn)
+          router.replace('/dashboard')
         })
         .catch(error => console.log(error))
     },
@@ -80,58 +75,22 @@ export default new Vuex.Store({
       if (!token) {
         return
       }
-      const expirationDate = localStorage.getItem('expirationDate')
-      const now = new Date()
-      if (now >= expirationDate) {
-        return
-      }
-      const userId = localStorage.getItem('userId')
       commit('authUser', {
         token: token,
-        userId: userId
       })
     },
     logout ({commit}) {
       commit('clearAuthData')
-      localStorage.removeItem('expirationDate')
       localStorage.removeItem('token')
-      localStorage.removeItem('userId')
       router.replace('/signin')
     },
-    storeUser ({commit, state}, userData) {
-      if (!state.idToken) {
-        return
-      }
-      globalAxios.post('/users.json' + '?auth=' + state.idToken, userData)
-        .then(res => console.log(res))
-        .catch(error => console.log(error))
-    },
-    fetchUser ({commit, state}) {
-      if (!state.idToken) {
-        return
-      }
-      globalAxios.get('/users.json' + '?auth=' + state.idToken)
-        .then(res => {
-          console.log(res)
-          const data = res.data
-          const users = []
-          for (let key in data) {
-            const user = data[key]
-            user.id = key
-            users.push(user)
-          }
-          console.log(users)
-          commit('storeUser', users[0])
-        })
-        .catch(error => console.log(error))
-    }
+    
   },
   getters: {
-    user (state) {
-      return state.user
-    },
     isAuthenticated (state) {
-      return state.idToken !== null
-    }
-  }
+      return state.token !== null
+    },
+
+  },
+
 })
